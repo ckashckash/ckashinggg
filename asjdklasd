@@ -1,0 +1,492 @@
+
+
+local mod = loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
+local Serika = {
+			Main = Color3.fromRGB(50, 52, 55),
+			Secondary = Color3.fromRGB(80, 82, 85),
+			Tertiary = Color3.fromRGB(226, 183, 20),
+
+			StrongText = Color3.fromHSV(0, 0, 1),		
+			WeakText = Color3.fromHSV(0, 0, 172/255)
+		}
+
+local wndw = mod:Create{
+    Name = "CUTE HUB",
+    Size = UDim2.fromOffset(600, 400),
+    Theme = Serika,  -- Use manually defined Aqua theme
+}
+
+local T1 = wndw:Tab{
+    Name = "Main",
+    Icon = "rbxassetid://16805304845"
+}
+
+local T2 = wndw:Tab{
+    Name = "Auto Farm",
+    Icon = "rbxassetid://15239834023"
+}
+
+
+local T3 = wndw:Tab{
+    Name = "Teleport",
+    Icon = "rbxassetid://15239851744"
+}
+
+
+local T4 = wndw:Tab{
+    Name = "Machineee and Egg",
+    Icon = "rbxassetid://15239811963"
+}
+
+local T5 = wndw:Tab{
+    Name = "Mount",
+    Icon = "rbxassetid://15239814935"
+}
+
+
+local player = game.Players.LocalPlayer
+local playerChar = workspace:WaitForChild(player.Name)
+local playerHRP = playerChar:WaitForChild("HumanoidRootPart")
+local goldsFolder = workspace:WaitForChild("Golds")
+local workspace = game:GetService("Workspace")
+local cg = game:GetService("CoreGui")
+local player = {
+  self = game:GetService("Players").LocalPlayer,
+  all = game:GetService("Players")
+}
+
+
+local var = {
+    click = true,
+    reb = false,
+    egg = {
+      id = 0,
+      count = 3,
+      speed = 0.01,
+      toggle = false
+    },
+    mapid = 50001,
+    fuse = false,
+    bring = false,
+  }
+
+
+local function getChildren(path,funct)
+    for i,v in pairs(path:GetChildren()) do
+      funct(v)
+    end
+  end
+  
+
+
+  
+local selectedRerollId = nil
+
+T4:Dropdown{
+	Name = "Select Reroll Type",
+	StartingText = "Choose Reroll",
+	Items = {
+		"Reroll Amplification",
+		"Reroll Awakening",
+		"Reroll Talisman"
+	},
+	Callback = function(selection)
+		local ids = {
+			["Reroll Amplification"] = 400001,
+			["Reroll Awakening"] = 400002,
+			["Reroll Talisman"] = 400005
+		}
+		selectedRerollId = ids[selection]
+	end
+}
+
+T4:Toggle{
+	Name = "Start Rerolling",
+	StartingState = false,
+	Description = "Toggle rerolling for selected type",
+	Callback = function(value)
+		while value and selectedRerollId do
+			wait(0.5)
+			game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RerollOrnament"):InvokeServer(selectedRerollId)
+		end
+	end
+}
+
+
+
+ T2:Toggle{
+    Name = "Auto click",
+    StartingState = false,
+    Description = nil,
+    Callback = function(value)
+        var.click = value
+        local args = {
+            [1] = {}
+        }
+        while wait() do
+            if var.click == false then break end
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PlayerClickAttackSkill"):FireServer(unpack(args))
+            wait(0.01)  -- Adjust the wait time as needed
+        end
+    end
+}
+ 
+
+T2:Toggle{
+    Name = "Auto collect dropped items",
+    StartingState = false,
+    Description = nil,
+    Callback = function(value)
+        var.bring = value
+        while wait() do
+            if var.bring == false then break end
+            
+            -- Iterate through all the dropped items in 'Golds' folder
+            for _, gold in ipairs(goldsFolder:GetChildren()) do
+                if gold:IsA("BasePart") and gold.Name == "OutGold" then
+                    -- Move the gold towards the player's HumanoidRootPart
+                    gold.CFrame = playerHRP.CFrame * CFrame.new(0, 0, -2)
+                end
+            end
+        end
+    end
+}
+
+
+
+
+T1:Toggle{
+    Name = "Auto Reborn",
+    StartingState = false,
+    Description = nil,
+    Callback = function(value)
+        var.reb = value
+        while wait() do
+            if var.reb == false then break end
+            game:GetService("ReplicatedStorage")["Remotes"]["PlayerReborn"]:FireServer()
+        end
+    end
+}
+
+T1:Toggle{
+    Name = "Auto fuse weapon",
+    StartingState = false,
+    Description = nil,
+    Callback = function(value)
+        var.fuse = value
+        while wait() do
+            if var.fuse == false then break end
+            game:GetService("ReplicatedStorage")["Remotes"]["FuseWeapon"]:FireServer()
+        end
+    end
+}
+
+
+T3:Toggle{
+    Name = "Auto Dungeon",
+    StartingState = false,
+    Description = "Must be in Map 3",
+    Callback = function(value)
+        local canTeleport = true
+        local isTeleportEnabled = value
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local TeleportRemote = ReplicatedStorage.Remotes.LocalPlayerTeleport
+        local TowerFolder = workspace:WaitForChild("Maps"):WaitForChild("Map3"):WaitForChild("Map"):WaitForChild("TeleportPoints"):WaitForChild("Tower")
+
+        TowerFolder.ChildAdded:Connect(function(child)
+            if isTeleportEnabled and child:IsA("Model") and child.Name == "TowerUnlock" and canTeleport then
+                TeleportRemote:FireServer({["mapId"] = 50016})
+                canTeleport = false
+            end
+        end)
+
+        TowerFolder.ChildRemoved:Connect(function(child)
+            if child:IsA("Model") and child.Name == "TowerUnlock" then
+                canTeleport = true
+            end
+        end)
+    end
+}
+
+
+T3:Dropdown{
+	Name = "Bypass Teleport",
+	StartingText = "Select Location",
+    Description = "Someone Should be inside already",
+	Items = {
+		"Join Dungeon",
+		"Join Tower",
+		"Join Relic"
+	},
+	Callback = function(selection)
+		local mapIds = {
+			["Join Dungeon"] = 50016,
+			["Join Tower"] = 50107,
+			["Join Relic"] = 50900,
+		}
+
+		local mapId = mapIds[selection]
+		if mapId then
+			game:GetService("ReplicatedStorage")["Remotes"]["LocalPlayerTeleport"]:FireServer({["mapId"] = mapId})
+		end
+	end
+}
+
+
+
+local ab = Instance.new("TextLabel")
+
+-- This will be the GUI toggle state
+local antiAfkEnabled = true  -- Default is enabled
+
+local bb = game:GetService('VirtualUser')
+
+-- Function to start Anti-AFK behavior
+local function startAntiAfk()
+    game:GetService('Players').LocalPlayer.Idled:Connect(function()
+        if antiAfkEnabled then
+            bb:CaptureController()
+            bb:ClickButton2(Vector2.new())
+            ab.Text = "Roblox tried kicking you but I didn't let them!"
+            wait(2)
+            ab.Text = "Status: Active"
+        end
+    end)
+end
+
+-- Automatically enable Anti-AFK on startup
+if antiAfkEnabled then
+    startAntiAfk()
+end
+
+-- Toggle to control Anti-AFK
+local function toggleAntiAfk(value)
+    antiAfkEnabled = value
+    if value then
+        ab.Text = "Status: Active"
+        startAntiAfk()  -- Restart the anti-afk if re-enabled
+    else
+        ab.Text = "Status: Disabled"
+    end
+end
+
+-- GUI for toggle button
+T1:Toggle{
+    Name = "Enable Anti-AFK",
+    StartingState = antiAfkEnabled,
+    Description = "Prevent being kicked for inactivity.",
+    Callback = toggleAntiAfk
+}
+
+local loaded = false
+
+T2:Toggle{
+	Name = "Auto Farm V1",
+	StartingState = false,
+	Callback = function(state)
+		_G.ToggleAutoFarm = state
+
+		if state then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/AutoFarmV1"))()
+		end
+	end
+}
+
+
+
+T1:Toggle{
+    Name = "Auto Pumpkin",
+    StartingState = false,
+    Description = "AUTOMATICALLY GET PUMPKIN BOX FROM ALL MAPS",
+    Callback = function(state)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/AutoPumpkin"))()
+    end
+}
+
+-- Unlimited Diamond Toggle (T2)
+T1:Toggle{
+	Name = "Unlimited Diamond",
+	StartingState = false,
+	Description = "YOU SHOULD BE IN MAP 5",
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/DiamondKey"))()
+	end
+}
+
+
+-- Auto SPIN
+
+
+-- Auto Spin Diamond Key Toggle (T3)
+do
+	local autoSpinRunning = false
+
+	T1:Toggle{
+		Name = "Auto Spin Diamond Key",
+		StartingState = false,
+		Description = "Automatically rerolls the halo using diamond keys.",
+		Callback = function(state)
+			autoSpinRunning = state
+			if state then
+				task.spawn(function()
+					while autoSpinRunning do
+						local args = {
+							[1] = 3
+						}
+
+						game:GetService("ReplicatedStorage")
+							:WaitForChild("Remotes")
+							:WaitForChild("RerollHalo")
+							:InvokeServer(unpack(args))
+
+						task.wait(0.1)
+					end
+				end)
+			end
+		end
+	}
+end
+
+--- 
+
+	T2:Toggle{
+		Name = "AUTO FARM v2",
+		StartingState = false,
+		Description = "TELEPORT THE ENEMY IN FRONT OF YOU",
+        Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/AutofarmV2"))()
+	end
+}
+
+T3:Dropdown{
+	Name = "Server Options",
+	StartingText = "Select an Option",
+	Items = {
+		"Server Hop",
+		"Rejoin Server",
+		"Server Hop [ Low Players ]"
+	},
+	Callback = function(selection)
+		local TeleportService = game:GetService("TeleportService")
+		local HttpService = game:GetService("HttpService")
+		local Players = game:GetService("Players")
+		local PlaceId = game.PlaceId
+		local CurrentJobId = game.JobId
+
+		if selection == "Server Hop" then
+			local success, servers = pcall(function()
+				local response = game:HttpGetAsync(
+					"https://games.roblox.com/v1/games/"..PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+				)
+				return HttpService:JSONDecode(response)
+			end)
+
+			if success and servers and servers.data then
+				for _, server in ipairs(servers.data) do
+					if server.playing < server.maxPlayers and server.id ~= CurrentJobId then
+						TeleportService:TeleportToPlaceInstance(PlaceId, server.id)
+						return
+					end
+				end
+			else
+				warn("Failed to retrieve servers")
+			end
+
+		elseif selection == "Rejoin Server" then
+			TeleportService:Teleport(PlaceId, Players.LocalPlayer)
+
+		elseif selection == "Server Hop [ Low Players ]" then
+			local success, servers = pcall(function()
+				local response = game:HttpGetAsync(
+					"https://games.roblox.com/v1/games/"..PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+				)
+				return HttpService:JSONDecode(response)
+			end)
+
+			if success and servers and servers.data then
+				for _, server in ipairs(servers.data) do
+					if server.playing <= 5 and server.id ~= CurrentJobId then
+						TeleportService:TeleportToPlaceInstance(PlaceId, server.id)
+						return
+					end
+				end
+			else
+				warn("Failed to retrieve servers")
+			end
+		end
+	end
+}
+
+
+
+
+T2:Slider{
+    Name = "Movement Speed",
+    Default = 70,
+    Min = 0,
+    Max = 500,
+    Callback = function(value)
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        
+        -- Set the humanoid's WalkSpeed to the slider value
+        humanoid.WalkSpeed = value
+    end
+}
+
+local mounts = {
+    ["Space Ship"] = 100001,
+    ["Deep Sea"] = 100002,
+    ["Flying Leaves"] = 100003,
+    ["Hamburger"] = 100004,
+    ["Dragon"] = 100005,
+    ["Cloud"] = 100006,
+    ["Dreamy Light Wheel"] = 100007,
+    ["Rubber Dukiro"] = 100008,
+    ["Frigate"] = 100009,
+    ["Blue Flash"] = 100010,
+    ["Egg Cart"] = 100011,
+}
+
+T5:Dropdown{
+    Name = "Mount",
+    StartingText = "Select a Mount",
+    Items = {
+        "Space Ship",
+        "Deep Sea",
+        "Flying Leaves",
+        "Hamburger",
+        "Dragon",
+        "Cloud",
+        "Dreamy Light Wheel",
+        "Rubber Dukiro",
+        "Frigate",
+        "Blue Flash",
+        "Egg Cart",
+    },
+    Callback = function(selection)
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("EquipMount"):FireServer(mounts[selection])
+    end
+}
+
+local function hatch()
+    getChildren(workspace.Maps,function(a)
+        getChildren(a.Map.Eggs,function(array)
+            game:GetService("ReplicatedStorage")["Remotes"]["ExtractHero"]:InvokeServer({["drawCardPlatformId"] = array:GetAttribute("Id"),["count"] = var.egg.count})
+        end)
+    end)
+end
+
+T4:Toggle{
+    Name = "Auto Hatch",
+    StartingState = false,
+    Description = "Hatch nearest EGG",
+    Callback = function(value)
+        var.egg.toggle = value
+        while var.egg.toggle do
+            hatch()
+            wait(var.egg.speed) 
+        end
+    end
+}
