@@ -287,7 +287,7 @@ T2:Toggle{
 		_G.ToggleAutoFarm = state
 
 		if state then
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/AutoFarmV1"))()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/ckashckash/ckashinggg/refs/heads/main/AutoFarmV1"))()
 		end
 	end
 }
@@ -299,7 +299,7 @@ T1:Toggle{
     StartingState = false,
     Description = "AUTOMATICALLY GET PUMPKIN BOX FROM ALL MAPS",
     Callback = function(state)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/AutoPumpkin"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ckashckash/ckashinggg/refs/heads/main/AutoPumpkin"))()
     end
 }
 
@@ -309,7 +309,7 @@ T1:Toggle{
 	StartingState = false,
 	Description = "YOU SHOULD BE IN MAP 5",
 	Callback = function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/DiamondKey"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/ckashckash/ckashinggg/refs/heads/main/DiamondKey"))()
 	end
 }
 
@@ -354,7 +354,7 @@ end
 		StartingState = false,
 		Description = "TELEPORT THE ENEMY IN FRONT OF YOU",
         Callback = function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/cuteeeee1587/Cute/refs/heads/main/AutofarmV2"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/ckashckash/ckashinggg/refs/heads/main/AutofarmV2"))()
 	end
 }
 
