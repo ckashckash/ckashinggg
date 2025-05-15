@@ -1,3 +1,14 @@
+-- Game restriction check
+if game.PlaceId ~= 72615021017011 then
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Script Hub",
+        Text = "❌ This script is not available in this game.",
+        Duration = 6
+    })
+    return
+end
+
+-- Key System starts below
 local KeyGuardLibrary = loadstring(game:HttpGet("https://cdn.keyguardian.org/library/v1.0.0.lua"))()
 local trueData = "4494a184ab8f4d63a393b2644cce3882"
 local falseData = "af67322c1ba84817b1877c3f9ced8009"
@@ -56,7 +67,7 @@ local function validateAndLoad(k)
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/ckashckash/ckashinggg/refs/heads/main/asjdklasd"))()
            
 			-- Destroy the window once the key is valid
-			Window:Destroy()  -- This will destroy the entire UI after key validation.
+			Window:Destroy()
 		else
 			Fluent:Notify({
 				Title = "Invalid Key",
