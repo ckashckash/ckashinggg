@@ -7,7 +7,7 @@ if game.PlaceId ~= 72615021017011 then
     })
     return
 end
-
+ 
 -- Key System starts below
 local KeyGuardLibrary = loadstring(game:HttpGet("https://cdn.keyguardian.org/library/v1.0.0.lua"))()
 local trueData = "4494a184ab8f4d63a393b2644cce3882"
