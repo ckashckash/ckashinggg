@@ -1,5 +1,9 @@
--- Game restriction check
-if game.PlaceId ~= 72615021017011 then
+local allowedPlaceIds = {
+    [72615021017011] = true,
+    [79326806968179] = true
+}
+
+if not allowedPlaceIds[game.PlaceId] then
     game.StarterGui:SetCore("SendNotification", {
         Title = "Script Hub",
         Text = "❌ This script is not available in this game.",
