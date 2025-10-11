@@ -1,0 +1,83 @@
+local TweenService = game:GetService("TweenService")
+
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+
+-- Main Frame
+local frame = Instance.new("Frame", screenGui)
+frame.Size, frame.Position, frame.AnchorPoint, frame.ClipsDescendants = UDim2.fromOffset(400,150), UDim2.fromScale(0.5,0.5), Vector2.new(0.5,0.5), true
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0,20)
+
+-- Gradient Background
+local gradient = Instance.new("UIGradient", frame)
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,182,193)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,105,180)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255,20,147))
+}
+gradient.Rotation = 45
+
+-- Title
+local title = Instance.new("TextLabel", frame)
+title.Size, title.Position, title.BackgroundTransparency, title.Text, title.TextScaled, title.Font, title.TextColor3 = UDim2.fromScale(1,0.4), UDim2.fromScale(0,0.1), 1, "🎉 WELCOME PREMIUM 🎉", true, Enum.Font.GothamBold, Color3.fromRGB(255,255,255)
+
+-- Title pulsing
+spawn(function()
+    while frame.Parent do
+        for i=0,1,0.02 do
+            title.TextColor3 = Color3.fromHSV(i,1,1)
+            task.wait(0.005)
+        end
+    end
+end)
+
+-- Loading Bar Background
+local loadBG = Instance.new("Frame", frame)
+loadBG.Size, loadBG.Position, loadBG.BackgroundColor3, loadBG.BorderSizePixel = UDim2.fromScale(0.8,0.2), UDim2.fromScale(0.1,0.65), Color3.fromRGB(255,182,193), 0
+Instance.new("UICorner", loadBG).CornerRadius = UDim.new(0,15)
+
+-- Loading Bar Fill
+local loadBar = Instance.new("Frame", loadBG)
+loadBar.Size, loadBar.Position, loadBar.BackgroundColor3, loadBar.BorderSizePixel = UDim2.fromScale(0,1), UDim2.fromScale(0,0), Color3.fromRGB(255,105,180), 0
+Instance.new("UICorner", loadBar).CornerRadius = UDim.new(0,15)
+
+-- Peach emoji inside loading bar
+local peachLabel = Instance.new("TextLabel", loadBG)
+peachLabel.Size, peachLabel.Position, peachLabel.BackgroundTransparency, peachLabel.Text, peachLabel.TextScaled, peachLabel.Font, peachLabel.TextColor3 = UDim2.fromScale(0.1,1), UDim2.fromScale(0,0), 1, "🍑", true, Enum.Font.GothamBold, Color3.fromRGB(255,255,255)
+
+-- Animate peach along the loading bar with bounce
+spawn(function()
+    local startTime = tick()
+    while frame.Parent do
+        local elapsed = tick() - startTime
+        local progress = math.clamp(elapsed/4.5,0,1)
+        peachLabel.Position = UDim2.fromScale(0 + 0.9*progress, 0)
+        peachLabel.Position = peachLabel.Position + UDim2.new(0,0,0,math.sin(elapsed*25)*5) -- faster bounce
+        task.wait(0.001)
+    end
+end)
+
+-- Tween fill loading bar faster (4.5 seconds)
+TweenService:Create(loadBar, TweenInfo.new(4.5, Enum.EasingStyle.Linear), {Size = UDim2.fromScale(1,1)}):Play()
+
+-- Splash effect at the end (drops spawn randomly across the frame)
+task.delay(4.5, function()
+    for i=1,80 do
+        local drop = Instance.new("TextLabel", frame)
+        drop.Size = UDim2.fromOffset(20,20)
+        drop.Position = UDim2.new(math.random(),0,math.random(),0) -- RANDOM position
+        drop.BackgroundTransparency = 1
+        drop.Text = "💦"
+        drop.TextScaled = true
+        drop.Font = Enum.Font.GothamBold
+        drop.TextColor3 = Color3.fromRGB(255,255,255)
+        local randRot = math.random(-180,180)
+        TweenService:Create(drop, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {Position = UDim2.new(math.random(),0,math.random(),0), Rotation = randRot, TextTransparency = 1}):Play()
+        task.wait(0.005)
+    end
+end)
+
+-- Auto destroy at 5 seconds
+task.delay(6, function()
+    if screenGui and screenGui.Parent then screenGui:Destroy() end
+end)
